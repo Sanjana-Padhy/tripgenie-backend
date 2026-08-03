@@ -8,6 +8,8 @@ import com.tripgenie.backend.dto.LoginResponse;
 import com.tripgenie.backend.dto.RegisterRequest;
 import com.tripgenie.backend.service.UserService;
 
+import jakarta.validation.Valid;
+
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -17,9 +19,12 @@ public class AuthController {
 
     // Register
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
-        return userService.registerUser(request);
-    }
+    public String register(
+        @Valid
+        @RequestBody RegisterRequest request) {
+
+    return userService.registerUser(request);
+}
 
     // Login
     @PostMapping("/login")
