@@ -11,13 +11,16 @@ import com.tripgenie.backend.dto.LoginResponse;
 import com.tripgenie.backend.dto.RegisterRequest;
 import com.tripgenie.backend.entity.User;
 import com.tripgenie.backend.repository.UserRepository;
-import com.tripgenie.backend.security.JwtUtil;
+import com.tripgenie.backend.util.JwtUtil;
 
 @Service
 public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private JwtUtil jwtUtil;
 
     private BCryptPasswordEncoder passwordEncoder =
             new BCryptPasswordEncoder();
@@ -56,8 +59,8 @@ public class UserService {
             return new LoginResponse(null, "Invalid Password");
         }
 
-        String token = JwtUtil.generateToken(user.getEmail());
-
+       String token = jwtUtil.generateToken(user.getEmail());
+       
         return new LoginResponse(token, "Login Successful");
     }
 }
