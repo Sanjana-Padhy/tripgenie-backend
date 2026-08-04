@@ -43,24 +43,4 @@ public class TripResponse {
     public Double getBudget() {
         return budget;
     }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setDestination(String destination) {
-        this.destination = destination;
-    }
-
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
-    }
-
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
-
-    public void setBudget(Double budget) {
-        this.budget = budget;
-    }
 }

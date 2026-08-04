@@ -8,6 +8,10 @@ import com.tripgenie.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.tripgenie.backend.dto.TripResponse;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class TripService {
 
@@ -36,4 +40,22 @@ public class TripService {
 
         return "Trip Created Successfully";
     }
+    public List<TripResponse> getUserTrips(String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new RuntimeException("User not found"));
+
+    List<Trip> trips = tripRepository.findByUser(user);
+
+    return trips.stream()
+            .map(trip -> new TripResponse(
+                    trip.getId(),
+                    trip.getDestination(),
+                    trip.getStartDate(),
+                    trip.getEndDate(),
+                    trip.getBudget()
+            ))
+            .collect(Collectors.toList());
+}
 }
