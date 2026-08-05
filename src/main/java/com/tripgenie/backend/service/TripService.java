@@ -58,4 +58,22 @@ public class TripService {
             ))
             .collect(Collectors.toList());
 }
+public String deleteTrip(Long tripId, String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new RuntimeException("User not found"));
+
+    Trip trip = tripRepository.findById(tripId)
+            .orElseThrow(() ->
+                    new RuntimeException("Trip not found"));
+
+    if (!trip.getUser().getId().equals(user.getId())) {
+        throw new RuntimeException("You cannot delete someone else's trip");
+    }
+
+    tripRepository.delete(trip);
+
+    return "Trip Deleted Successfully";
+}
 }

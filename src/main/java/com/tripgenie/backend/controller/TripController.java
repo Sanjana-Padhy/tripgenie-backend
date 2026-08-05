@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
@@ -47,4 +49,13 @@ public class TripController {
 
         return tripService.getUserTrips(email);
     }
+    @DeleteMapping("/{id}")
+    public String deleteTrip(
+        @PathVariable Long id,
+        Authentication authentication) {
+
+        return tripService.deleteTrip(
+            id,
+            authentication.getName());
+}
 }
