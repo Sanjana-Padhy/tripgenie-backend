@@ -12,6 +12,8 @@ import com.tripgenie.backend.dto.TripResponse;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.tripgenie.backend.dto.UpdateTripRequest;
+
 @Service
 public class TripService {
 
@@ -75,5 +77,35 @@ public String deleteTrip(Long tripId, String email) {
     tripRepository.delete(trip);
 
     return "Trip Deleted Successfully";
+}
+public String updateTrip(Long tripId,
+                         UpdateTripRequest request,
+                         String email) {
+
+    // Find logged-in user
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new RuntimeException("User not found"));
+
+    // Find trip
+    Trip trip = tripRepository.findById(tripId)
+            .orElseThrow(() ->
+                    new RuntimeException("Trip not found"));
+
+    // Check ownership
+    if (!trip.getUser().getId().equals(user.getId())) {
+        throw new RuntimeException("Unauthorized");
+    }
+
+    // Update fields
+    trip.setDestination(request.getDestination());
+    trip.setStartDate(request.getStartDate());
+    trip.setEndDate(request.getEndDate());
+    trip.setBudget(request.getBudget());
+
+    // Save updated trip
+    tripRepository.save(trip);
+
+    return "Trip Updated Successfully";
 }
 }

@@ -14,6 +14,12 @@ import java.util.List;
 
 import org.springframework.security.core.Authentication;
 
+import com.tripgenie.backend.dto.UpdateTripRequest;
+import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
 @RestController
 @RequestMapping("/api/trips")
 public class TripController {
@@ -56,6 +62,17 @@ public class TripController {
 
         return tripService.deleteTrip(
             id,
+            authentication.getName());
+}
+@PutMapping("/{id}")
+public String updateTrip(
+        @PathVariable Long id,
+        @Valid @RequestBody UpdateTripRequest request,
+        Authentication authentication) {
+
+    return tripService.updateTrip(
+            id,
+            request,
             authentication.getName());
 }
 }
