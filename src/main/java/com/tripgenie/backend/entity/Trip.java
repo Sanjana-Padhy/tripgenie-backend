@@ -16,7 +16,11 @@ public class Trip {
 
     private String endDate;
 
-    private Double budget;
+    private double budget;
+
+    private String travelStyle;
+
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -27,6 +31,10 @@ public class Trip {
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getDestination() {
@@ -53,12 +61,28 @@ public class Trip {
         this.endDate = endDate;
     }
 
-    public Double getBudget() {
+    public double getBudget() {
         return budget;
     }
 
-    public void setBudget(Double budget) {
+    public void setBudget(double budget) {
         this.budget = budget;
+    }
+
+    public String getTravelStyle() {
+        return travelStyle;
+    }
+
+    public void setTravelStyle(String travelStyle) {
+        this.travelStyle = travelStyle;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public User getUser() {

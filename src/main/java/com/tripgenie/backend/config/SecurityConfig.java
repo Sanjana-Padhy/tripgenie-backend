@@ -17,6 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+
 @Configuration
 public class SecurityConfig {
 
@@ -34,9 +35,10 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/api/auth/**",
-                        "/api/test"
-                ).permitAll()
+        "/api/auth/**",
+        "/api/test",
+        "/api/ai/**"
+).permitAll()
                 .anyRequest().authenticated()
                 )
 
@@ -54,6 +56,8 @@ public class SecurityConfig {
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+    
 
     @Bean
     AuthenticationManager authenticationManager(

@@ -13,6 +13,10 @@ import com.tripgenie.backend.entity.User;
 import com.tripgenie.backend.repository.UserRepository;
 import com.tripgenie.backend.util.JwtUtil;
 
+import com.tripgenie.backend.dto.UserProfileResponse;
+
+import com.tripgenie.backend.dto.UpdateProfileRequest;
+
 @Service
 public class UserService {
 
@@ -63,4 +67,44 @@ public class UserService {
        
         return new LoginResponse(token, "Login Successful");
     }
+
+   // Get Logged-in User Profile
+public UserProfileResponse getProfile(String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    return new UserProfileResponse(
+            user.getId(),
+            user.getFullName(),
+            user.getEmail()
+    );
+}
+
+// Update Logged-in User Profile
+public UserProfileResponse updateProfile(
+        String currentEmail,
+        UpdateProfileRequest request) {
+
+    User user = userRepository.findByEmail(currentEmail)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+    // Check whether the new email belongs to another user
+    if (!currentEmail.equals(request.getEmail())
+            && userRepository.existsByEmail(request.getEmail())) {
+
+        throw new RuntimeException("Email already exists");
+    }
+
+    user.setFullName(request.getFullName());
+    user.setEmail(request.getEmail());
+
+    userRepository.save(user);
+
+    return new UserProfileResponse(
+            user.getId(),
+            user.getFullName(),
+            user.getEmail()
+    );
+}
 }
