@@ -16,7 +16,7 @@ public class AIController {
     public String generateItinerary(
             @RequestBody GenerateItineraryRequest request) {
 
-                System.out.println("AI Controller Hit");
+        System.out.println("AI Controller Hit");
 
         return geminiService.generateItinerary(request);
     }
