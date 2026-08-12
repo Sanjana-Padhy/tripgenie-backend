@@ -22,6 +22,8 @@ public class Trip {
 
     private String status;
 
+    private boolean saved;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -83,6 +85,14 @@ public class Trip {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public boolean isSaved() {
+        return saved;
+    }
+
+    public void setSaved(boolean saved) {
+        this.saved = saved;
     }
 
     public User getUser() {
