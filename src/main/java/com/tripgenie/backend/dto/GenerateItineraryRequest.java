@@ -2,15 +2,22 @@ package com.tripgenie.backend.dto;
 
 public class GenerateItineraryRequest {
 
+    private String source;
     private String destination;
-
     private int days;
-
     private double budget;
-
+    private int travelers;
     private String travelStyle;
 
     public GenerateItineraryRequest() {
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public String getDestination() {
@@ -35,6 +42,14 @@ public class GenerateItineraryRequest {
 
     public void setBudget(double budget) {
         this.budget = budget;
+    }
+
+    public int getTravelers() {
+        return travelers;
+    }
+
+    public void setTravelers(int travelers) {
+        this.travelers = travelers;
     }
 
     public String getTravelStyle() {
