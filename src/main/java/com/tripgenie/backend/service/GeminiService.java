@@ -16,8 +16,7 @@ public class GeminiService {
 
     @Value("${gemini.api.key}")
     private String apiKey;
-
-    public String generateItinerary(GenerateItineraryRequest request) {
+public String generateItinerary(GenerateItineraryRequest request) {
 
     if (apiKey == null || apiKey.isBlank()) {
         throw new IllegalStateException(
@@ -25,35 +24,38 @@ public class GeminiService {
         );
     }
 
-    Client client = Client.builder()
-            .apiKey(apiKey)
-            .build();
+    try {
+
+        Client client = Client.builder()
+                .apiKey(apiKey)
+                .build();
 
         String prompt =
-        "Create a "
-                + request.getDays()
-                + "-day "
-                + request.getTravelStyle()
-                + " trip itinerary from "
-                + request.getSource()
-                + " to "
-                + request.getDestination()
-                + " for "
-                + request.getTravelers()
-                + " travelers within a total budget of ₹"
-                + request.getBudget()
-                + ".\n\n"
-                + "Consider the starting location when planning the journey. "
-                + "The itinerary should be practical for "
-                + request.getTravelers()
-                + " travelers. "
-                + "Consider transportation, food, activities and other reasonable travel expenses. "
-                + "Do not exceed the total budget. "
-                + "Create a practical itinerary suitable for the specified budget. "
-                + "Include activities in chronological order for each day. "
-                + "Include realistic estimated costs. "
-                + "Return ONLY valid JSON matching the provided schema. "
-                + "Do not include markdown, explanations, or text outside the JSON.";
+                "Create a "
+                        + request.getDays()
+                        + "-day "
+                        + request.getTravelStyle()
+                        + " trip itinerary from "
+                        + request.getSource()
+                        + " to "
+                        + request.getDestination()
+                        + " for "
+                        + request.getTravelers()
+                        + " travelers within a total budget of ₹"
+                        + request.getBudget()
+                        + ".\n\n"
+                        + "Consider the starting location when planning the journey. "
+                        + "The itinerary should be practical for "
+                        + request.getTravelers()
+                        + " travelers. "
+                        + "Consider transportation, food, activities and other reasonable travel expenses. "
+                        + "Do not exceed the total budget. "
+                        + "Create a practical itinerary suitable for the specified budget. "
+                        + "Include activities in chronological order for each day. "
+                        + "Include realistic estimated costs. "
+                        + "Return ONLY valid JSON matching the provided schema. "
+                        + "Do not include markdown, explanations, or text outside the JSON.";
+
         // Activity schema
         Schema activitySchema = Schema.builder()
                 .type("OBJECT")
@@ -120,47 +122,50 @@ public class GeminiService {
 
         // Complete itinerary schema
         Schema itinerarySchema = Schema.builder()
-        .type("OBJECT")
-        .properties(Map.of(
+                .type("OBJECT")
+                .properties(Map.of(
 
-                "source", Schema.builder()
-                        .type("STRING")
-                        .build(),
+                        "source", Schema.builder()
+                                .type("STRING")
+                                .build(),
 
-                "destination", Schema.builder()
-                        .type("STRING")
-                        .build(),
+                        "destination", Schema.builder()
+                                .type("STRING")
+                                .build(),
 
-                "travelers", Schema.builder()
-                        .type("INTEGER")
-                        .build(),
+                        "travelers", Schema.builder()
+                                .type("INTEGER")
+                                .build(),
 
-                "totalBudget", Schema.builder()
-                        .type("NUMBER")
-                        .build(),
+                        "totalBudget", Schema.builder()
+                                .type("NUMBER")
+                                .build(),
 
-                "days", Schema.builder()
-                        .type("ARRAY")
-                        .items(daySchema)
-                        .build()
-        ))
-        .required(List.of(
-                "source",
-                "destination",
-                "travelers",
-                "totalBudget",
-                "days"
-        ))
-        .build();
+                        "days", Schema.builder()
+                                .type("ARRAY")
+                                .items(daySchema)
+                                .build()
+                ))
+                .required(List.of(
+                        "source",
+                        "destination",
+                        "travelers",
+                        "totalBudget",
+                        "days"
+                ))
+                .build();
 
-        // Tell Gemini to return JSON according to our schema
         GenerateContentConfig config =
                 GenerateContentConfig.builder()
                         .responseMimeType("application/json")
                         .responseSchema(itinerarySchema)
                         .build();
 
-        // Call Gemini
+        System.out.println("==========================================");
+        System.out.println("CALLING GEMINI API");
+        System.out.println("Model: gemini-3.5-flash");
+        System.out.println("==========================================");
+
         GenerateContentResponse response =
                 client.models.generateContent(
                         "gemini-3.5-flash",
@@ -168,7 +173,30 @@ public class GeminiService {
                         config
                 );
 
-        // Return the generated JSON
-        return response.text();
+        System.out.println("==========================================");
+        System.out.println("GEMINI API RESPONSE RECEIVED");
+        System.out.println("==========================================");
+
+        String result = response.text();
+
+        System.out.println("Generated itinerary:");
+        System.out.println(result);
+
+        return result;
+
+    } catch (Exception e) {
+
+        System.err.println("==========================================");
+        System.err.println("GEMINI API ERROR");
+        System.err.println("==========================================");
+
+        e.printStackTrace();
+
+        throw new RuntimeException(
+                "Failed to generate itinerary using Gemini: "
+                        + e.getMessage(),
+                e
+        );
     }
+}
 }
