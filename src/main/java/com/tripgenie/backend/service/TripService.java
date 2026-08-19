@@ -42,6 +42,34 @@ public class TripService {
 
         return "Trip Created Successfully";
     }
+
+    public Long createAiTrip(
+        com.tripgenie.backend.dto.GenerateItineraryRequest request,
+        String email) {
+
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() ->
+                    new RuntimeException("User not found"));
+
+    Trip trip = new Trip();
+
+    trip.setDestination(request.getDestination());
+
+    trip.setBudget(request.getBudget());
+
+    trip.setTravelStyle(request.getTravelStyle());
+
+    trip.setStatus("AI_GENERATED");
+
+    trip.setSaved(false);
+
+    trip.setUser(user);
+
+    Trip savedTrip = tripRepository.save(trip);
+
+    return savedTrip.getId();
+}
+
     public List<TripResponse> getUserTrips(String email) {
 
     User user = userRepository.findByEmail(email)
