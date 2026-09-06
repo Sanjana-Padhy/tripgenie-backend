@@ -1,6 +1,7 @@
 package com.tripgenie.backend.controller;
 
 import com.tripgenie.backend.dto.SavedItineraryResponse;
+import com.tripgenie.backend.entity.SavedItinerary;
 import com.tripgenie.backend.service.SavedItineraryService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,14 +18,25 @@ public class SavedItineraryController {
     private SavedItineraryService savedItineraryService;
 
     @PostMapping("/{tripId}")
-    public String saveItinerary(
+    public SavedItineraryResponse saveItinerary(
             @PathVariable Long tripId,
             Authentication authentication) {
 
         String email = authentication.getName();
 
-        return savedItineraryService
-                .saveItinerary(tripId, email);
+        SavedItinerary savedItinerary =
+                savedItineraryService
+                        .saveItinerary(tripId, email);
+
+        return new SavedItineraryResponse(
+                savedItinerary.getId(),
+                savedItinerary.getTrip().getId(),
+                savedItinerary.getTrip().getDestination(),
+                savedItinerary.getTrip().getBudget(),
+                savedItinerary.getTrip().getTravelStyle(),
+                savedItinerary.getTrip().getStatus(),
+                savedItinerary.getTrip().isSaved()
+        );
     }
 
     @GetMapping
@@ -37,14 +49,16 @@ public class SavedItineraryController {
                 .getSavedItineraries(email);
     }
 
-    @DeleteMapping("/{savedId}")
+    @DeleteMapping("/{tripId}")
     public String removeSavedItinerary(
-            @PathVariable Long savedId,
+            @PathVariable Long tripId,
             Authentication authentication) {
 
         String email = authentication.getName();
 
-        return savedItineraryService
-                .removeSavedItinerary(savedId, email);
+        savedItineraryService
+                .removeSavedItinerary(tripId, email);
+
+        return "Itinerary removed from saved trips";
     }
 }
