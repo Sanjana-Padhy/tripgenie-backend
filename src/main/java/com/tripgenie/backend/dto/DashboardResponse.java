@@ -7,6 +7,7 @@ public class DashboardResponse {
     private long totalTrips;
     private long upcomingTrips;
     private long completedTrips;
+    private long savedTrips;
     private double totalBudget;
     private List<TripResponse> recentTrips;
 
@@ -17,12 +18,14 @@ public class DashboardResponse {
             long totalTrips,
             long upcomingTrips,
             long completedTrips,
+            long savedTrips,
             double totalBudget,
             List<TripResponse> recentTrips) {
 
         this.totalTrips = totalTrips;
         this.upcomingTrips = upcomingTrips;
         this.completedTrips = completedTrips;
+        this.savedTrips = savedTrips;
         this.totalBudget = totalBudget;
         this.recentTrips = recentTrips;
     }
@@ -37,6 +40,10 @@ public class DashboardResponse {
 
     public long getCompletedTrips() {
         return completedTrips;
+    }
+
+    public long getSavedTrips() {
+        return savedTrips;
     }
 
     public double getTotalBudget() {

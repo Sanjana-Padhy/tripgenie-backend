@@ -37,6 +37,11 @@ public class DashboardService {
         // Total trips
         long totalTrips = trips.size();
 
+        // Total saved trips
+        long savedTrips = trips.stream()
+                .filter(Trip::isSaved)
+                .count();
+
         // Current date
         LocalDate today = LocalDate.now();
 
@@ -70,7 +75,9 @@ public class DashboardService {
                         trip.getDestination(),
                         trip.getStartDate(),
                         trip.getEndDate(),
-                        trip.getBudget()
+                        trip.getBudget(),
+                        trip.getTravelStyle(),
+                        trip.getStatus()
                 ))
                 .collect(Collectors.toList());
 
@@ -78,6 +85,7 @@ public class DashboardService {
                 totalTrips,
                 upcomingTrips,
                 completedTrips,
+                savedTrips,
                 totalBudget,
                 recentTrips
         );

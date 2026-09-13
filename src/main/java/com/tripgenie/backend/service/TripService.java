@@ -79,14 +79,16 @@ public class TripService {
     List<Trip> trips = tripRepository.findByUser(user);
 
     return trips.stream()
-            .map(trip -> new TripResponse(
-                    trip.getId(),
-                    trip.getDestination(),
-                    trip.getStartDate(),
-                    trip.getEndDate(),
-                    trip.getBudget()
-            ))
-            .collect(Collectors.toList());
+        .map(trip -> new TripResponse(
+                trip.getId(),
+                trip.getDestination(),
+                trip.getStartDate(),
+                trip.getEndDate(),
+                trip.getBudget(),
+                trip.getTravelStyle(),
+                trip.getStatus()
+        ))
+        .collect(Collectors.toList());
 }
 public String deleteTrip(Long tripId, String email) {
 
