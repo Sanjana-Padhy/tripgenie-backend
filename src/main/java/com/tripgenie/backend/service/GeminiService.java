@@ -185,18 +185,16 @@ public String generateItinerary(GenerateItineraryRequest request) {
         return result;
 
     } catch (Exception e) {
+    System.out.println("==========================================");
+    System.out.println("GEMINI API ERROR");
+    System.out.println("==========================================");
 
-        System.err.println("==========================================");
-        System.err.println("GEMINI API ERROR");
-        System.err.println("==========================================");
+    e.printStackTrace();
 
-        e.printStackTrace();
-
-        throw new RuntimeException(
-                "Failed to generate itinerary using Gemini: "
-                        + e.getMessage(),
-                e
-        );
-    }
+    throw new RuntimeException(
+            "Gemini AI is temporarily unavailable. Please try again in a moment.",
+            e
+    );
+}
 }
 }
