@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
@@ -13,14 +14,26 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    private static final String SECRET =
-            "TripGenieSecretKeyTripGenieSecretKey123456";
+    private final SecretKey key;
 
+    public JwtUtil(@Value("${jwt.secret}") String secret) {
 
-    private final SecretKey key =
-            Keys.hmacShaKeyFor(
-                    SECRET.getBytes(StandardCharsets.UTF_8)
+        if (secret == null || secret.isBlank()) {
+            throw new IllegalStateException(
+                    "JWT secret is not configured. Please set JWT_SECRET."
             );
+        }
+
+        if (secret.getBytes(StandardCharsets.UTF_8).length < 32) {
+            throw new IllegalStateException(
+                    "JWT secret must be at least 32 bytes long."
+            );
+        }
+
+        this.key = Keys.hmacShaKeyFor(
+                secret.getBytes(StandardCharsets.UTF_8)
+        );
+    }
 
 
     // =========================================================
@@ -77,10 +90,6 @@ public class JwtUtil {
 
         } catch (Exception e) {
 
-            System.out.println(
-                    "JWT validation exception: "
-                            + e.getMessage()
-            );
 
             return false;
         }

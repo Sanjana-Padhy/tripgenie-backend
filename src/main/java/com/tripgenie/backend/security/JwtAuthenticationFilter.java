@@ -22,19 +22,15 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-
 @Component
 public class JwtAuthenticationFilter
         extends OncePerRequestFilter {
 
-
     @Autowired
     private JwtUtil jwtUtil;
 
-
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-
 
     @Override
     protected void doFilterInternal(
@@ -43,92 +39,38 @@ public class JwtAuthenticationFilter
             FilterChain filterChain)
             throws ServletException, IOException {
 
-
-        // =========================================================
-        // CORS PRE-FLIGHT
-        // =========================================================
-
+        // CORS pre-flight
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-
             filterChain.doFilter(request, response);
-
             return;
         }
-
-
-        // =========================================================
-        // REQUEST INFORMATION
-        // =========================================================
-
-        System.out.println();
-        System.out.println("==========================================");
-        System.out.println("JWT FILTER");
-        System.out.println(
-                request.getMethod()
-                + " "
-                + request.getRequestURI()
-        );
-
-
-        // =========================================================
-        // GET AUTHORIZATION HEADER
-        // =========================================================
 
         String authorizationHeader =
                 request.getHeader("Authorization");
 
-
-        System.out.println(
-                "Authorization Header Present: "
-                + (authorizationHeader != null)
-        );
-
-
         String username = null;
         String jwtToken = null;
 
-
-        // =========================================================
-        // CHECK BEARER TOKEN
-        // =========================================================
-
+        // Check Bearer token
         if (authorizationHeader != null
                 && authorizationHeader.startsWith("Bearer ")) {
 
             jwtToken =
                     authorizationHeader.substring(7);
 
-
-            System.out.println(
-                    "Bearer token received."
-            );
-
-
             try {
 
                 username =
                         jwtUtil.extractUsername(jwtToken);
 
-
-                System.out.println(
-                        "JWT username: "
-                        + username
-                );
-
             } catch (Exception e) {
 
-                System.out.println(
-                        "JWT extraction failed: "
-                        + e.getMessage()
-                );
+                // Invalid or malformed JWT.
+                // Continue the filter chain without authentication.
             }
         }
 
-
-        // =========================================================
-        // AUTHENTICATE USER
-        // =========================================================
-
+        // Authenticate user
         if (username != null
                 && SecurityContextHolder
                     .getContext()
@@ -140,19 +82,11 @@ public class JwtAuthenticationFilter
                         customUserDetailsService
                                 .loadUserByUsername(username);
 
-
                 boolean validToken =
                         jwtUtil.validateToken(
                                 jwtToken,
                                 username
                         );
-
-
-                System.out.println(
-                        "JWT valid: "
-                        + validToken
-                );
-
 
                 if (validToken) {
 
@@ -164,53 +98,28 @@ public class JwtAuthenticationFilter
                                     userDetails.getAuthorities()
                             );
 
-
                     authentication.setDetails(
                             new WebAuthenticationDetailsSource()
                                     .buildDetails(request)
                     );
-
 
                     SecurityContextHolder
                             .getContext()
                             .setAuthentication(
                                     authentication
                             );
-
-
-                    System.out.println(
-                            "JWT authentication SUCCESSFUL"
-                    );
-
-                } else {
-
-                    System.out.println(
-                            "JWT authentication FAILED"
-                    );
                 }
-
 
             } catch (Exception e) {
 
-                System.out.println(
-                        "JWT authentication exception: "
-                        + e.getMessage()
-                );
+                // Authentication failed.
+                // Continue the filter chain without authentication.
             }
         }
-
-
-        // =========================================================
-        // CONTINUE REQUEST
-        // =========================================================
 
         filterChain.doFilter(
                 request,
                 response
-        );
-
-        System.out.println(
-                "=========================================="
         );
     }
 }
