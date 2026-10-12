@@ -1,3 +1,4 @@
+
 package com.tripgenie.backend.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -5,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tripgenie.backend.dto.GenerateItineraryRequest;
 import com.tripgenie.backend.entity.AiItinerary;
 import com.tripgenie.backend.entity.Trip;
+import com.tripgenie.backend.exception.ForbiddenOperationException;
+import com.tripgenie.backend.exception.ResourceNotFoundException;
 import com.tripgenie.backend.repository.AiItineraryRepository;
 import com.tripgenie.backend.repository.TripRepository;
 import com.tripgenie.backend.service.GeminiService;
@@ -35,13 +38,11 @@ public class AIController {
     @Autowired
     private TripRepository tripRepository;
 
-
+    // Generate and save an AI itinerary
     @PostMapping("/generate")
     public String generateItinerary(
             @RequestBody GenerateItineraryRequest request,
             Authentication authentication) {
-
-        System.out.println("AI Controller Hit");
 
         String email = authentication.getName();
 
@@ -50,19 +51,16 @@ public class AIController {
                 geminiService.generateItinerary(request);
 
         // 2. Create Trip record
-        Long tripId =
-                tripService.createAiTrip(request, email);
+        Long tripId = tripService.createAiTrip(request, email);
 
         try {
-
             // 3. Find the newly created Trip
             Trip trip = tripRepository.findById(tripId)
                     .orElseThrow(() ->
-                            new RuntimeException("Trip not found"));
+                            new ResourceNotFoundException("Trip not found"));
 
-            // 4. Save complete Gemini itinerary
-            AiItinerary aiItinerary =
-                    new AiItinerary();
+            // 4. Save the complete Gemini itinerary
+            AiItinerary aiItinerary = new AiItinerary();
 
             aiItinerary.setTrip(trip);
             aiItinerary.setItineraryJson(itineraryJson);
@@ -82,16 +80,18 @@ public class AIController {
             // 7. Return JSON
             return objectMapper.writeValueAsString(itinerary);
 
-        } catch (Exception e) {
+        } catch (ResourceNotFoundException ex) {
+            throw ex;
 
+        } catch (Exception ex) {
             throw new RuntimeException(
                     "Failed to save AI itinerary",
-                    e
+                    ex
             );
         }
     }
 
-
+    // Retrieve a saved AI itinerary
     @GetMapping("/trips/{tripId}")
     public String getAiItinerary(
             @PathVariable Long tripId,
@@ -101,18 +101,18 @@ public class AIController {
 
         Trip trip = tripRepository.findById(tripId)
                 .orElseThrow(() ->
-                        new RuntimeException("Trip not found"));
+                        new ResourceNotFoundException("Trip not found"));
 
-        // Security: make sure this trip belongs to logged-in user
+        // Ensure the trip belongs to the logged-in user
         if (!trip.getUser().getEmail().equals(email)) {
-            throw new RuntimeException(
+            throw new ForbiddenOperationException(
                     "You are not authorized to view this trip");
         }
 
         AiItinerary aiItinerary =
                 aiItineraryRepository.findByTrip(trip)
                         .orElseThrow(() ->
-                                new RuntimeException(
+                                new ResourceNotFoundException(
                                         "AI itinerary not found"));
 
         return aiItinerary.getItineraryJson();

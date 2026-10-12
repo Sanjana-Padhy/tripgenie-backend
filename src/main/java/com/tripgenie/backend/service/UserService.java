@@ -1,3 +1,4 @@
+
 package com.tripgenie.backend.service;
 
 import java.util.Optional;
@@ -9,13 +10,13 @@ import org.springframework.stereotype.Service;
 import com.tripgenie.backend.dto.LoginRequest;
 import com.tripgenie.backend.dto.LoginResponse;
 import com.tripgenie.backend.dto.RegisterRequest;
+import com.tripgenie.backend.dto.UserProfileResponse;
+import com.tripgenie.backend.dto.UpdateProfileRequest;
 import com.tripgenie.backend.entity.User;
+import com.tripgenie.backend.exception.DuplicateResourceException;
+import com.tripgenie.backend.exception.ResourceNotFoundException;
 import com.tripgenie.backend.repository.UserRepository;
 import com.tripgenie.backend.util.JwtUtil;
-
-import com.tripgenie.backend.dto.UserProfileResponse;
-
-import com.tripgenie.backend.dto.UpdateProfileRequest;
 
 @Service
 public class UserService {
@@ -26,14 +27,14 @@ public class UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    private BCryptPasswordEncoder passwordEncoder =
+    private final BCryptPasswordEncoder passwordEncoder =
             new BCryptPasswordEncoder();
 
     // Register User
     public String registerUser(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            return "Email already exists!";
+            throw new DuplicateResourceException("Email already exists!");
         }
 
         User user = new User();
@@ -59,52 +60,55 @@ public class UserService {
 
         User user = optionalUser.get();
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(
+                request.getPassword(), user.getPassword())) {
             return new LoginResponse(null, "Invalid Password");
         }
 
-       String token = jwtUtil.generateToken(user.getEmail());
-       
+        String token = jwtUtil.generateToken(user.getEmail());
+
         return new LoginResponse(token, "Login Successful");
     }
 
-   // Get Logged-in User Profile
-public UserProfileResponse getProfile(String email) {
+    // Get Logged-in User Profile
+    public UserProfileResponse getProfile(String email) {
 
-    User user = userRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
-    return new UserProfileResponse(
-            user.getId(),
-            user.getFullName(),
-            user.getEmail()
-    );
-}
-
-// Update Logged-in User Profile
-public UserProfileResponse updateProfile(
-        String currentEmail,
-        UpdateProfileRequest request) {
-
-    User user = userRepository.findByEmail(currentEmail)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-    // Check whether the new email belongs to another user
-    if (!currentEmail.equals(request.getEmail())
-            && userRepository.existsByEmail(request.getEmail())) {
-
-        throw new RuntimeException("Email already exists");
+        return new UserProfileResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail()
+        );
     }
 
-    user.setFullName(request.getFullName());
-    user.setEmail(request.getEmail());
+    // Update Logged-in User Profile
+    public UserProfileResponse updateProfile(
+            String currentEmail,
+            UpdateProfileRequest request) {
 
-    userRepository.save(user);
+        User user = userRepository.findByEmail(currentEmail)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found"));
 
-    return new UserProfileResponse(
-            user.getId(),
-            user.getFullName(),
-            user.getEmail()
-    );
-}
+        // Check whether the new email belongs to another user
+        if (!currentEmail.equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+
+            throw new DuplicateResourceException("Email already exists");
+        }
+
+        user.setFullName(request.getFullName());
+        user.setEmail(request.getEmail());
+
+        userRepository.save(user);
+
+        return new UserProfileResponse(
+                user.getId(),
+                user.getFullName(),
+                user.getEmail()
+        );
+    }
 }
