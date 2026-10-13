@@ -1,3 +1,4 @@
+
 package com.tripgenie.backend.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,16 +20,13 @@ public class AuthController {
 
     // Register
     @PostMapping("/register")
-    public String register(
-        @Valid
-        @RequestBody RegisterRequest request) {
-
-    return userService.registerUser(request);
-}
+    public String register(@Valid @RequestBody RegisterRequest request) {
+        return userService.registerUser(request);
+    }
 
     // Login
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest request) {
+    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
         return userService.loginUser(request);
     }
 }

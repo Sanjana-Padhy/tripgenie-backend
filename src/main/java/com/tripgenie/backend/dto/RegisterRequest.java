@@ -1,3 +1,4 @@
+
 package com.tripgenie.backend.dto;
 
 import jakarta.validation.constraints.Email;
@@ -9,10 +10,11 @@ public class RegisterRequest {
     @NotBlank(message = "Full Name is required")
     private String fullName;
 
-    @Email(message = "Enter valid email")
     @NotBlank(message = "Email is required")
+    @Email(message = "Enter valid email")
     private String email;
 
+    @NotBlank(message = "Password is required")
     @Size(min = 6, message = "Password must contain at least 6 characters")
     private String password;
 

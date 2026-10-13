@@ -1,3 +1,4 @@
+
 package com.tripgenie.backend.dto;
 
 import jakarta.validation.constraints.Email;
@@ -5,11 +6,11 @@ import jakarta.validation.constraints.NotBlank;
 
 public class UpdateProfileRequest {
 
-    @NotBlank
+    @NotBlank(message = "Full name is required")
     private String fullName;
 
-    @NotBlank
-    @Email
+    @NotBlank(message = "Email is required")
+    @Email(message = "Enter a valid email")
     private String email;
 
     public UpdateProfileRequest() {

@@ -17,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.validation.Valid;
+
 import java.util.Map;
 
 @RestController
@@ -41,7 +43,7 @@ public class AIController {
     // Generate and save an AI itinerary
     @PostMapping("/generate")
     public String generateItinerary(
-            @RequestBody GenerateItineraryRequest request,
+           @Valid @RequestBody GenerateItineraryRequest request,
             Authentication authentication) {
 
         String email = authentication.getName();

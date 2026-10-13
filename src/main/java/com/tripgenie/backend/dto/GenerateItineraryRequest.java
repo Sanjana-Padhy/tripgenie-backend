@@ -1,12 +1,30 @@
 package com.tripgenie.backend.dto;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
+
 public class GenerateItineraryRequest {
 
+    @NotBlank(message = "Source is required")
     private String source;
+
+    @NotBlank(message = "Destination is required")
     private String destination;
+
+    @Positive(message = "Days must be greater than zero")
     private int days;
-    private double budget;
+
+    @NotNull(message = "Budget is required")
+    @PositiveOrZero(message = "Budget cannot be negative")
+    private Double budget;
+
+    @Positive(message = "Travelers must be greater than zero")
     private int travelers;
+
+    @NotBlank(message = "Travel style is required")
     private String travelStyle;
 
     public GenerateItineraryRequest() {
@@ -36,11 +54,11 @@ public class GenerateItineraryRequest {
         this.days = days;
     }
 
-    public double getBudget() {
+    public Double getBudget() {
         return budget;
     }
 
-    public void setBudget(double budget) {
+    public void setBudget(Double budget) {
         this.budget = budget;
     }
 
